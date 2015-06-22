@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Sequence, Foreign
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine(app.config["DATABASE_URI"])
+engine = create_engine("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec2-174-129-21-42.compute-1.amazonaws.com:5432/d6ki3e1ckkv6f3")
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -20,7 +20,7 @@ class User(Base):
 	id = Column(Integer, primary_key=True)
 	name = Column(String(128), nullable=False)
 	email = Column(String(128), nullable=False)
-	groups_owned = relationship("Groups", backref="users.id")
+	groups_owned = relationship("Group", backref="users.id")
 
 class Group(Base):
 	__tablename__ = "groups"
@@ -39,7 +39,8 @@ def input_emails():
 	self_name = raw_input("Who are you? ")
 	self_email = raw_input("Your email:" )
 
-	creator = session.query(User).filter(name=self_name, email=self_email).first()
+	creator = session.query(User).filter(User.name==self_name, User.email==self_email).first()
+	print "yo"
 	if creator:
 		creator_id = creator.id
 	else:
@@ -134,5 +135,5 @@ def create_message(messages_sent, users):
 	messages_sent += 1
 
 
-
+input_emails()
 	
