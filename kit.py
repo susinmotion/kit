@@ -31,7 +31,7 @@ class Group(Base):
 	users = relationship("User", secondary="groups_users_association", backref="users")
 
 groups_users=Table('groups_users_association', Base.metadata,
-	Column('group_id', Integer, ForeignKey('groups.id'))
+	Column('group_id', Integer, ForeignKey('groups.id')),
 	Column('user_id', Integer, ForeignKey('users.id'))
 	)
 
@@ -127,7 +127,7 @@ def send_message(msgtext, emails):
 
 def create_message(messages_sent, users):
 	message=messages[messages_sent]
-	message=users[-1] + " and " + users[-2] ",\n" + message
+	message=users[-1] + " and " + users[-2] + ",\n" + message
 	for user in users [::-3]:
 		message = user + ", " + message
 	message = "Dear "+ message
