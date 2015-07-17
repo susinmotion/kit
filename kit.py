@@ -15,30 +15,32 @@ class DevelopmentConfig(object):
     DEBUG = True
 
 class User(Base):
-	__tablename__ = "users"
+	__tablename__ = "kit_users"
 
 	id = Column(Integer, primary_key=True)
 	name = Column(String(128), nullable=False)
 	email = Column(String(128), nullable=False)
-	groups_owned = relationship("Group", backref="users.id")
+	groups_owned = relationship("Group", backref="kit_users.id")
 
 class Group(Base):
 	__tablename__ = "groups"
 
 	id = Column(Integer, primary_key=True)
 	name = Column(String(128), nullable=False)
-	creator_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-	users = relationship("User", secondary="groups_users_association", backref="users")
+	creator_id = Column(Integer, ForeignKey('kit_users.id'), nullable=False)
+	users = relationship("User", secondary="groups_users_association", backref="kit_users")
 
 groups_users=Table('groups_users_association', Base.metadata,
 	Column('group_id', Integer, ForeignKey('groups.id')),
-	Column('user_id', Integer, ForeignKey('users.id'))
+	Column('user_id', Integer, ForeignKey('kit_users.id'))
 	)
+
+Base.metadata.create_all(engine)
 
 def input_emails():
 	self_name = raw_input("Who are you? ")
-	self_email = raw_input("Your email:" )
-
+	self_email = raw_input("Your email: " )
+	print "hi"
 	creator = session.query(User).filter(User.name==self_name, User.email==self_email).first()
 	print "yo"
 	if creator:
@@ -46,14 +48,14 @@ def input_emails():
 	else:
 		creator = User(name=self_name, email=self_email)
 		session.add(creator)
-		session.commit(creator)
-		creator = session.query(User).filter(name=self_name, email=self_email).first()
+		session.commit()
+		creator = session.query(User).filter(User.name==self_name, User.email==self_email).first()
 		creator_id = creator.id
 
 	new_group="Y"
 	while new_group == "Y":
 		group_name = raw_input("What would you like to call your group? ")
-		group = sesson.query(Group).filter(name=group_name, creator_id=creator_id).first()
+		group = session.query(Group).filter(Group.name==group_name, Group.creator_id==creator_id).first()
 		if group:
 			group_id = group.id
 			add_users = raw_input("You already created this group. Would you like to add more users? Please type Y or N ")
@@ -94,7 +96,7 @@ def put_users_in_database_and_group(group_id, names, emails):
 		if new_user:
 			new_user.group = group_id
 			continue
-		new_user = Users(names[i], emails[i])
+		new_user = User(names[i], emails[i])
 		session.add(new_user)
 		session.commit()
 
