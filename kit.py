@@ -6,6 +6,9 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 from login import username, password
+
+from email.mime.text import MIMEText
+import smtplib
 engine = create_engine("postgres://pmehzpfkeotntn:u4OXp20HhAef8TD8L9Hqk1LciC@ec2-174-129-21-42.compute-1.amazonaws.com:5432/d6ki3e1ckkv6f3")
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
@@ -99,19 +102,26 @@ def put_persons_in_database_and_group(group_id, names, emails):
 			new_user.group = group_id
 			continue
 		new_user = Person(name=names[i], email=emails[i])
+		print new_user, "new user"
 		session.add(new_user)
 		session.commit()
 
 
+def create_message(msgtext, names, emails, subject):
+	msgtext=persons[-1] + " and " + persons[-2] + ",\n" + msgtext
+	for user in persons [::-3]:
+		msgtext = user + ", " + msgtext
+	msgtext = "Dear "+ msgtext
+	#messages_sent += 1
 
-def send_message(msgtext, emails):
 	#make a new message
 	message=MIMEText(msgtext)
 
 	#fill it in
-	message['Subject']="Your monthly checkin!"
-	message['From']="your friends at kit"
+	message['Subject']=subject
+	message['From']=names[0]
 	message['To']=emails
+	message['Reply-To']=emails
 
 	#set up the email server, via gmail
 	server=smtplib.SMTP('smtp.gmail.com', 587)
@@ -130,14 +140,10 @@ def send_message(msgtext, emails):
 	#quit the server
 	server.quit()
 
-def create_message(messages_sent, persons):
-	message=messages[messages_sent]
-	message=persons[-1] + " and " + persons[-2] + ",\n" + message
-	for user in persons [::-3]:
-		message = user + ", " + message
-	message = "Dear "+ message
-	messages_sent += 1
+def get_persons_from_group(group_name):
+	persons=session.query(Group).filter(Group.name==group_name).first().persons
 
-
+	print persons
 input_emails()
-	
+#send_message()
+#get_persons_from_group("a")	
