@@ -14,21 +14,17 @@ def prompts_to_list(promptsfile=PROMPTSFILE):
 		for row in reader:
 			if row == {'Prompt': '', 'Used?': ''}:
 				break
-			print row
 			prompts.append(row["Prompt"])
 			if not row["Used?"]:
 				rownumbers.append(count)
 			count=count+1
 	prompts.remove("Prompt")
 
-	print rownumbers
 	return prompts, rownumbers
 
 def select_prompt_and_remove_from_list(prompts, rownumbers, promptsfile=PROMPTSFILE):
 	prompt_row_number = random.choice(rownumbers)
 	rownumbers.remove(prompt_row_number)
-	print prompt_row_number
-	print rownumbers
 	with open(promptsfile, "wb") as csvfile:
 		writer=csv.DictWriter(csvfile, fieldnames=['Used?','Prompt'])
 		writer.writerow({"Used?":"Used?", "Prompt":"Prompt"})
@@ -41,12 +37,10 @@ def select_prompt_and_remove_from_list(prompts, rownumbers, promptsfile=PROMPTSF
 
 
 def send_message(msgtext, names=NAMES, emails=EMAILS, subject=SUBJECT):
-	print msgtext
 	msgtext=names[-2] + " and " + names[-1] + ",\n" + msgtext
 	for name in names [:-2]:
 		msgtext = name + ", " + msgtext
 	msgtext = "Dear "+ msgtext + "\nSent by The CMSK secret app"
-	print msgtext
 
 	message=MIMEText(msgtext)
 
@@ -66,7 +60,6 @@ def send_message(msgtext, names=NAMES, emails=EMAILS, subject=SUBJECT):
 
 	#log in
 	server.login(username, password)
-	print type(message)
 	#send the email
 	server.sendmail("Your friends at kit", emails, message.as_string())
 
