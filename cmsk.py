@@ -41,20 +41,20 @@ def select_prompt_and_remove_from_list(prompts, rownumbers, promptsfile=PROMPTSF
 
 
 def send_message(msgtext, names=NAMES, emails=EMAILS, subject=SUBJECT):
-	msgtext=names[-1] + " and " + names[-2] + ",\n" + msgtext
-	for name in names [::-3]:
+	print msgtext
+	msgtext=names[-2] + " and " + names[-1] + ",\n" + msgtext
+	for name in names [:-2]:
 		msgtext = name + ", " + msgtext
-	msgtext = "Dear "+ msgtext
-	#messages_sent += 1
+	msgtext = "Dear "+ msgtext + "\nSent by The CMSK secret app"
+	print msgtext
 
-	#make a new message
 	message=MIMEText(msgtext)
 
 	#fill it in
 	message['Subject']=subject
 	message['From']="CMSK secret app"
-	message['To']=emails
-	message['Reply-To']=emails
+	message['To']=",".join(emails)
+	message['Reply-To']=",".join(emails)
 
 	#set up the email server, via gmail
 	server=smtplib.SMTP('smtp.gmail.com', 587)
@@ -66,7 +66,7 @@ def send_message(msgtext, names=NAMES, emails=EMAILS, subject=SUBJECT):
 
 	#log in
 	server.login(username, password)
-
+	print type(message)
 	#send the email
 	server.sendmail("Your friends at kit", emails, message.as_string())
 
